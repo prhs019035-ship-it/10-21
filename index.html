@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>六堆：客家人守護家園的故事</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts & LXGW WenKai Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;900&display=swap" rel="stylesheet">
+    <!-- Anime.js for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: '#F4ECD8',
+                        paperDark: '#E8DCB8',
+                        hakkaBlue: '#1D4ED8',
+                        hakkaDarkBlue: '#1E3A8A',
+                        brickRed: '#991B1B',
+                        inkBlack: '#1C1917',
+                        riceYellow: '#D97706',
+                        vintageBorder: '#B45309'
+                    },
+                    fontFamily: {
+                        heading: ['LXGW WenKai TC', 'Noto Serif TC', 'serif'],
+                        body: ['Noto Sans TC', 'sans-serif'],
+                        serif: ['LXGW WenKai TC', 'Noto Serif TC', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Aged Paper & Visual Polish */
+        body {
+            background-color: #F4ECD8;
+            background-image: 
+                radial-gradient(#d5c39e 1px, transparent 1px),
+                radial-gradient(#d5c39e 1px, #F4ECD8 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            color: #1C1917;
+            font-family: 'Noto Sans TC', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Enhanced Timeline Node Hover Effects */
+        .timeline-node {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .timeline-node:hover {
+            transform: scale(1.22) translateY(-6px);
+        }
+        .timeline-node-circle {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .timeline-node:hover .timeline-node-circle {
+            box-shadow: 0 10px 25px -3px rgba(153, 27, 27, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Map Interactive Route Nodes (Matching Timeline Animations) */
+        .route-node {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center center;
+            cursor: pointer;
+        }
+        .route-node:hover {
+            transform: scale(1.28) translateY(-4px);
+        }
+        .route-node circle {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .route-node:hover circle {
+            filter: drop-shadow(0 8px 16px rgba(153, 27, 27, 0.5));
+        }
+
+        /* Scroll Animation Utility Classes */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger Delay Helpers */
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+        .delay-400 { transition-delay: 400ms; }
+
+        /* Photo Tape & Corner Styles */
+        .photo-frame {
+            position: relative;
+            background: #ffffff;
+            padding: 10px 10px 25px 10px;
+            box-shadow: 3px 5px 15px rgba(0,0,0,0.15);
+            transform: rotate(-1deg);
+            transition: all 0.3s ease;
+        }
+        .photo-frame:hover {
+            transform: rotate(0deg) scale(1.02);
+            box-shadow: 5px 8px 20px rgba(0,0,0,0.25);
+        }
+        .photo-tape {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%) rotate(2deg);
+            width: 90px;
+            height: 26px;
+            background-color: rgba(243, 226, 186, 0.85);
+            border: 1px dashed rgba(180, 83, 9, 0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .photo-corner {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            z-index: 5;
+        }
+        .corner-tl { top: -2px; left: -2px; border-width: 16px 16px 0 0; border-color: #991B1B transparent transparent transparent; }
+        .corner-tr { top: -2px; right: -2px; border-width: 0 16px 16px 0; border-color: transparent #991B1B transparent transparent; }
+
+        /* Speech Bubble */
+        .speech-bubble {
+            position: relative;
+            background: #FFFFFF;
+            border: 2px solid #D97706;
+            border-radius: 18px;
+            padding: 12px 18px;
+        }
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: #FFFFFF transparent;
+            display: block;
+            width: 0;
+        }
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 29px;
+            border-width: 11px 11px 0;
+            border-style: solid;
+            border-color: #D97706 transparent;
+            display: block;
+            width: 0;
+        }
+
+        /* Map Regions */
+        .map-region {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            transform-origin: center center;
+        }
+        .map-region:hover, .map-region.active {
+            fill: #991B1B !important;
+            fill-opacity: 0.85 !important;
+            stroke: #F4ECD8;
+            stroke-width: 3;
+            transform: scale(1.08);
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.35));
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #E8DCB8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #B45309;
+            border-radius: 5px;
+        }
+
+        /* Line clamping */
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* SVG Heading Motion Animation Styles */
+        .title-svg-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 680px;
+        }
+        .title-svg {
+            width: 100%;
+            height: auto;
+            overflow: visible;
+        }
+        .title-svg path.line {
+            fill: none;
+            stroke: #991B1B;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-inkBlack">
+
+    <!-- Navigation Bar -->
+    <header id="main-nav" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-paper/95 backdrop-blur border-b-2 border-vintageBorder/30 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Logo / Brand -->
+            <a href="#hero" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-full bg-hakkaDarkBlue flex items-center justify-center text-paper font-bold shadow border border-yellow-400">
+                    <i class="fa-solid fa-shirt text-lg"></i>
+                </div>
+                <span class="font-heading font-bold text-xl sm:text-2xl text-brickRed tracking-wider">六堆客家聚落形成史</span>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex space-x-6 font-medium text-lg">
+                <a href="#hero" class="nav-link text-inkBlack hover:text-brickRed transition-colors px-2 py-1">首頁</a>
+                <a href="#background" class="nav-link text-inkBlack hover:text-brickRed transition-colors px-2 py-1">渡臺背景</a>
+                <a href="#stories" class="nav-link text-inkBlack hover:text-brickRed transition-colors px-2 py-1">故事繪本</a>
+                <a href="#interactive-map" class="nav-link text-inkBlack hover:text-brickRed transition-colors px-2 py-1">地圖與時間軸</a>
+                <a href="#conclusion" class="nav-link text-inkBlack hover:text-brickRed transition-colors px-2 py-1">結語與測驗</a>
+            </nav>
+
+            <!-- Role Selector & Mobile Toggle -->
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <button id="role-selector-btn" class="flex items-center space-x-2 bg-riceYellow/20 border border-vintageBorder text-inkBlack px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-riceYellow/40 transition">
+                        <i class="fa-solid fa-user-tag text-brickRed"></i>
+                        <span id="current-role-text">學生視角</span>
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                    <!-- Role Dropdown -->
+                    <div id="role-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-paper border-2 border-vintageBorder rounded-lg shadow-xl z-50 py-1">
+                        <button onclick="setRole('student')" class="w-full text-left px-4 py-2 hover:bg-paperDark text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-graduation-cap text-hakkaBlue"></i>
+                            <span>學生版 (任務與故事)</span>
+                        </button>
+                        <button onclick="setRole('teacher')" class="w-full text-left px-4 py-2 hover:bg-paperDark text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-chalkboard-user text-brickRed"></i>
+                            <span>老師/家長版 (教學重點)</span>
+                        </button>
+                        <button onclick="setRole('researcher')" class="w-full text-left px-4 py-2 hover:bg-paperDark text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-book-bookmark text-riceYellow"></i>
+                            <span>文化工作者版 (完整史料)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-inkBlack text-2xl p-1 focus:outline-none">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-paper border-b border-vintageBorder px-4 pt-2 pb-4 space-y-2 font-medium">
+            <a href="#hero" class="block py-2 text-inkBlack hover:text-brickRed">首頁</a>
+            <a href="#background" class="block py-2 text-inkBlack hover:text-brickRed">渡臺背景</a>
+            <a href="#stories" class="block py-2 text-inkBlack hover:text-brickRed">故事繪本</a>
+            <a href="#interactive-map" class="block py-2 text-inkBlack hover:text-brickRed">地圖與時間軸</a>
+            <a href="#conclusion" class="block py-2 text-inkBlack hover:text-brickRed">結語與測驗</a>
+        </div>
+    </header>
+
+    <!-- 01 HERO SECTION -->
+    <section id="hero" class="pt-24 min-h-screen flex flex-col justify-between relative overflow-hidden border-b-4 border-vintageBorder/20">
+        <!-- Background Decorative Elements -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full my-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <!-- Main Title & Intro (Left 7 Cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="inline-flex items-center space-x-2 bg-brickRed/10 border border-brickRed/30 px-3 py-1 rounded-full text-brickRed text-sm font-semibold">
+                        <i class="fa-solid fa-compass"></i>
+                        <span>高屏溪畔的歷史長河</span>
+                    </div>
+
+                    <!-- Main Title with SVG Stroke Path Animation -->
+                    <div class="title-svg-wrapper">
+                        <svg class="title-svg" viewBox="0 0 520 140">
+                            <!-- SVG Text with Animated Stroke Paths for Original Title -->
+                            <text x="0" y="58" font-family="'LXGW WenKai TC', 'Noto Serif TC', serif" font-weight="700" font-size="54" fill="#1C1917">六堆：</text>
+                            <text x="0" y="122" font-family="'LXGW WenKai TC', 'Noto Serif TC', serif" font-weight="700" font-size="54" fill="#991B1B">客家人守護家園</text>
+                            <text x="380" y="122" font-family="'LXGW WenKai TC', 'Noto Serif TC', serif" font-weight="700" font-size="54" fill="#1C1917">的故事</text>
+                            <!-- Animated Underline Path -->
+                            <path class="line" d="M 0 134 Q 190 142 380 134" />
+                        </svg>
+                    </div>
+
+                    <p class="text-lg sm:text-xl text-stone-700 leading-relaxed font-serif">
+                        穿過渡海的波濤，踏上屏東平原的沃野。面對未知的荒野與局勢變動，先民如何結庄成營、協力築家？邀請你一同翻開這本歲月繪本，探尋六堆聚落三百年的歲月記憶。
+                    </p>
+
+                    <!-- Hakka Shirt Mascot Speech Banner -->
+                    <div class="speech-bubble max-w-xl shadow-sm flex items-start space-x-4 my-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-hakkaDarkBlue rounded-full flex items-center justify-center text-paper shadow">
+                            <i class="fa-solid fa-shirt text-2xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-riceYellow uppercase tracking-wider">藍衫嚮導 語錄</span>
+                            <p id="hero-guide-text" class="text-sm sm:text-base font-medium text-stone-800">
+                                「你好！我是藍衫導覽員。請先選擇你的探索身分，我會帶你用最有趣的角度認識六堆故事喔！」
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Image Frame (Right 5 Cols) -->
+                <div class="lg:col-span-5 flex justify-center">
+                    <div class="photo-frame max-w-md w-full my-4">
+                        <div class="photo-tape"></div>
+                        <div class="photo-corner corner-tl"></div>
+                        <div class="photo-corner corner-tr"></div>
+                        <img src="https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80" 
+                             alt="屏東平原大武山遠景與田野" 
+                             class="w-full h-64 sm:h-80 object-cover filter sepia-[0.25] contrast-[1.05]"
+                             onerror="this.src='https://placehold.co/800x600/E8DCB8/1C1917?text=屏東平原大武山遠景'">
+                        <div class="mt-3 flex justify-between items-center text-xs text-stone-600 font-serif">
+                            <span><i class="fa-solid fa-camera mr-1"></i> 遠眺屏東平原與大武山聖山</span>
+                            <span class="bg-stone-200 px-2 py-0.5 rounded">典藏/照片</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Role Selector Cards (Bottom Row) -->
+            <div class="mt-12 pt-8 border-t border-vintageBorder/30">
+                <h3 class="text-center font-heading text-xl font-bold text-stone-800 mb-6">—— 請選擇您的探索旅程身分 ——</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Student Card -->
+                    <div onclick="setRole('student')" class="role-card cursor-pointer bg-paper border-2 border-vintageBorder/40 rounded-xl p-5 hover:border-hakkaBlue hover:shadow-lg transition group">
+                        <div class="flex items-center space-x-4">
+                            <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=300&q=80" alt="學生探索" class="w-16 h-16 rounded-lg object-cover border border-vintageBorder">
+                            <div>
+                                <span class="text-xs bg-hakkaBlue/20 text-hakkaDarkBlue font-bold px-2 py-0.5 rounded">小學/國中生</span>
+                                <h4 class="font-heading font-bold text-lg text-inkBlack group-hover:text-hakkaBlue">探險家模式</h4>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-sm text-stone-600">趣味問題導入、繪本故事卡、解開任務並收集「六堆探險勳章」！</p>
+                    </div>
+
+                    <!-- Teacher Card -->
+                    <div onclick="setRole('teacher')" class="role-card cursor-pointer bg-paper border-2 border-vintageBorder/40 rounded-xl p-5 hover:border-brickRed hover:shadow-lg transition group">
+                        <div class="flex items-center space-x-4">
+                            <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=300&q=80" alt="教師導覽" class="w-16 h-16 rounded-lg object-cover border border-vintageBorder">
+                            <div>
+                                <span class="text-xs bg-brickRed/20 text-brickRed font-bold px-2 py-0.5 rounded">老師與家長</span>
+                                <h4 class="font-heading font-bold text-lg text-inkBlack group-hover:text-brickRed">教學引導模式</h4>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-sm text-stone-600">包含教學提問重點、素養學習單建議、核心概念與年級學習重點。</p>
+                    </div>
+
+                    <!-- Researcher Card -->
+                    <div onclick="setRole('researcher')" class="role-card cursor-pointer bg-paper border-2 border-vintageBorder/40 rounded-xl p-5 hover:border-riceYellow hover:shadow-lg transition group">
+                        <div class="flex items-center space-x-4">
+                            <img src="https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=300&q=80" alt="文史研究" class="w-16 h-16 rounded-lg object-cover border border-vintageBorder">
+                            <div>
+                                <span class="text-xs bg-riceYellow/20 text-amber-800 font-bold px-2 py-0.5 rounded">文史工作者</span>
+                                <h4 class="font-heading font-bold text-lg text-inkBlack group-hover:text-riceYellow">深度史料模式</h4>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-sm text-stone-600">提供清代古文書原文、完整歷史脈絡對照、地方文獻與參考書目。</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 02 BACKGROUND SECTION -->
+    <section id="background" class="py-20 border-b-4 border-vintageBorder/20 bg-paperDark/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12 reveal-on-scroll">
+                <h2 class="text-xs font-bold text-brickRed tracking-widest uppercase">SECTION 02</h2>
+                <h3 class="font-heading text-3xl sm:text-4xl font-black text-inkBlack mt-1">渡海開墾：從原鄉到屏東平原</h3>
+                <div class="w-16 h-1 bg-brickRed mx-auto my-3 rounded"></div>
+                <p class="text-stone-700 font-serif">清康熙年間，客家先民離開廣東惠州、潮州、嘉應州等地，踏上橫渡台灣海峽的艱險旅程...</p>
+            </div>
+
+            <!-- Route Map Interactive Canvas / Graphic -->
+            <div class="bg-paper border-2 border-vintageBorder rounded-2xl p-6 shadow-xl relative mb-12 reveal-on-scroll delay-100">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    
+                    <!-- SVG Route Visualizer (Left 7 Cols) -->
+                    <div class="lg:col-span-7 relative bg-amber-50/50 p-4 rounded-xl border border-vintageBorder/40">
+                        <h4 class="font-heading font-bold text-stone-800 mb-2 flex items-center">
+                            <i class="fa-solid fa-route text-brickRed mr-2"></i> 先民拓墾路線示意地圖 (點擊節點查看詳情)
+                        </h4>
+                        
+                        <svg viewBox="0 0 600 350" class="w-full h-auto rounded border border-amber-200 bg-[#F2E8D5]">
+                            <!-- Water / Ocean -->
+                            <path d="M 0,0 L 220,0 L 200,350 L 0,350 Z" fill="#D2E5E9" />
+                            <text x="70" y="180" fill="#4B7280" font-size="14" font-weight="bold" font-family="serif">臺灣海峽 (黑水溝)</text>
+                            
+                            <!-- Mainland Guangdong -->
+                            <path d="M 0,0 L 150,0 L 100,350 L 0,350 Z" fill="#E2D4B7" />
+                            <text x="20" y="100" fill="#5C4D38" font-size="14" font-weight="bold">廣東原鄉</text>
+
+                            <!-- Taiwan Island -->
+                            <path d="M 220,0 L 600,0 L 600,350 L 200,350 Z" fill="#E8DEC3" />
+                            <text x="450" y="80" fill="#786142" font-size="16" font-weight="bold">臺灣島 (府城與下淡水溪)</text>
+
+                            <!-- Rivers (下淡水溪 & 東港溪) -->
+                            <path d="M 320,160 Q 340,220 370,300" fill="none" stroke="#7AA5B8" stroke-width="6" />
+                            <text x="380" y="270" fill="#3B6373" font-size="11">下淡水溪(高屏溪)</text>
+                            <path d="M 370,280 Q 410,300 450,330" fill="none" stroke="#7AA5B8" stroke-width="4" />
+                            <text x="420" y="325" fill="#3B6373" font-size="10">東港溪</text>
+
+                            <!-- Interactive Nodes -->
+                            <!-- Node 1: Guangdong -->
+                            <g class="route-node group" onclick="showMigrationInfo('guangdong')">
+                                <circle cx="70" cy="120" r="14" fill="#991B1B" stroke="#F4ECD8" stroke-width="2" />
+                                <text x="70" y="124" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="bold">1</text>
+                                <text x="70" y="152" text-anchor="middle" fill="#1C1917" font-size="12" font-weight="bold" class="group-hover:fill-brickRed transition-colors">嘉應州/惠州/潮州</text>
+                            </g>
+
+                            <!-- Route Line 1 -->
+                            <path id="route-line-1" d="M 70,120 Q 150,130 250,150" fill="none" stroke="#991B1B" stroke-width="3" stroke-dasharray="6,4" />
+
+                            <!-- Node 2: Tainan (Fucheng) -->
+                            <g class="route-node group" onclick="showMigrationInfo('tainan')">
+                                <circle cx="250" cy="150" r="14" fill="#991B1B" stroke="#F4ECD8" stroke-width="2" />
+                                <text x="250" y="154" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="bold">2</text>
+                                <text x="250" y="132" text-anchor="middle" fill="#1C1917" font-size="12" font-weight="bold" class="group-hover:fill-brickRed transition-colors">臺南安平 (鹿耳門)</text>
+                            </g>
+
+                            <!-- Route Line 2 -->
+                            <path id="route-line-2" d="M 250,150 Q 300,200 370,250" fill="none" stroke="#991B1B" stroke-width="3" stroke-dasharray="6,4" />
+
+                            <!-- Node 3: Pingtung Plain -->
+                            <g class="route-node group" onclick="showMigrationInfo('pingtung')">
+                                <circle cx="370" cy="250" r="16" fill="#D97706" stroke="#F4ECD8" stroke-width="2" />
+                                <text x="370" y="255" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="bold">3</text>
+                                <text x="370" y="284" text-anchor="middle" fill="#991B1B" font-size="13" font-weight="bold" class="group-hover:fill-brickRed transition-colors">屏東平原開墾 (今六堆)</text>
+                            </g>
+                        </svg>
+                        <p class="text-xs text-stone-500 mt-2 text-center">地圖說明：先民自廣東渡海至臺灣府城，再轉往南部下淡水溪流域建立聚落。</p>
+                    </div>
+
+                    <!-- Dynamic Card Details (Right 5 Cols) -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div id="migration-detail-box" class="bg-paperDark/40 p-5 rounded-xl border border-vintageBorder">
+                            <span class="text-xs font-bold text-brickRed bg-brickRed/10 px-2.5 py-1 rounded-full">階段說明</span>
+                            <h4 id="mig-title" class="font-heading text-xl font-bold text-inkBlack mt-2">1. 廣東原鄉：出發的原因</h4>
+                            <p id="mig-desc" class="text-sm text-stone-700 mt-2 leading-relaxed font-serif">
+                                清朝初期，廣東東部山區（鎮平、程鄉、平遠、大埔等縣）人多地少，生活艱困。為了尋求更好的耕地與生路，許多客家先民勇敢選擇「唐山過臺灣」。
+                            </p>
+                            
+                            <!-- Role Specific Dynamic Content -->
+                            <div id="mig-role-box" class="mt-4 p-3 bg-paper rounded border border-stone-300 text-xs text-stone-800">
+                                <strong><i class="fa-solid fa-lightbulb text-riceYellow mr-1"></i> 學生思維提問：</strong>
+                                為什麼當時離鄉背井渡過危險的「黑水溝」需要無比的勇氣？
+                            </div>
+                        </div>
+
+                        <!-- Real Historical Images Modal Trigger -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="photo-frame overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?auto=format&fit=crop&w=400&q=80" alt="客家土樓圍屋" class="w-full h-24 object-cover transition-transform duration-300 ease-in-out transform hover:scale-110" onerror="this.src='https://placehold.co/400x300/E8DCB8/1C1917?text=原鄉客家建築'">
+                                <p class="text-[10px] text-stone-600 mt-1 font-serif text-center relative z-10 bg-white">廣東原鄉客家圍屋風格</p>
+                            </div>
+                            <div class="photo-frame overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=400&q=80" alt="高屏溪現況" class="w-full h-24 object-cover transition-transform duration-300 ease-in-out transform hover:scale-110" onerror="this.src='https://placehold.co/400x300/E8DCB8/1C1917?text=今日下淡水溪'">
+                                <p class="text-[10px] text-stone-600 mt-1 font-serif text-center relative z-10 bg-white">今日高屏溪 (昔下淡水溪)</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Role View Toggle Details -->
+            <div id="background-advanced-content" class="bg-paper p-6 rounded-xl border border-vintageBorder/50 shadow-sm reveal-on-scroll delay-200">
+                <h4 class="font-heading font-bold text-lg text-inkBlack mb-2 flex items-center">
+                    <i class="fa-solid fa-book-open text-brickRed mr-2"></i>
+                    <span id="bg-section-subtitle">小學生探險筆記：渡海三不准與開墾艱辛</span>
+                </h4>
+                <p id="bg-section-text" class="text-stone-700 text-sm sm:text-base leading-relaxed">
+                    清朝頒布了「渡臺禁令」，其中規定不准攜帶家眷。因此最早來臺的先民大多是單身男性（俗稱「羅漢腳」）。他們來到屏東平原後，需要合力開鑿水圳、開墾荒地，並與周邊不同族群建立合作與界線。
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 03 STORY CARDS SECTION -->
+    <section id="stories" class="py-20 border-b-4 border-vintageBorder/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-16 reveal-on-scroll">
+                <h2 class="text-xs font-bold text-brickRed tracking-widest uppercase">SECTION 03</h2>
+                <h3 class="font-heading text-3xl sm:text-4xl font-black text-inkBlack mt-1">繪本故事館：四大關鍵轉折</h3>
+                <div class="w-16 h-1 bg-brickRed mx-auto my-3 rounded"></div>
+                <p class="text-stone-700 font-serif">雜誌圖文風格帶你走進歷史現場，看先民如何從獨立聚落走向組織聯盟。</p>
+            </div>
+
+            <!-- 4 Story Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Story Card 1 -->
+                <div class="story-card bg-paper border-2 border-vintageBorder rounded-2xl p-6 shadow-md relative hover:shadow-xl transition reveal-on-scroll delay-100">
+                    <div class="photo-tape"></div>
+                    <span class="absolute top-4 right-4 text-3xl font-heading font-black text-vintageBorder/30">01</span>
+                    <span class="inline-block bg-brickRed text-paper text-xs font-bold px-2.5 py-1 rounded mb-3">1721年 朱一貴事件</span>
+                    <h4 class="font-heading text-2xl font-bold text-inkBlack mb-3">亂世起風波</h4>
+                    
+                    <div class="photo-frame mb-4">
+                        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80" alt="清代古地圖與告示" class="w-full h-48 object-cover filter sepia-[0.3]" onerror="this.src='https://placehold.co/800x400/E8DCB8/1C1917?text=清代官府告示古圖'">
+                        <p class="text-xs text-stone-600 mt-2 font-serif">圖：清代臺灣府城與周邊聚落防衛古圖</p>
+                    </div>
+
+                    <blockquote class="border-l-4 border-brickRed pl-3 italic text-stone-700 text-sm mb-3">
+                        「官逼民反，天下動盪。當社會秩序失序時，鄉親該如何自保？」
+                    </blockquote>
+
+                    <p class="story-text text-stone-800 text-sm leading-relaxed mb-4">
+                        康熙六十年（1721），臺灣爆發朱一貴事件，局勢相當混亂。高屏溪東岸的十三大庄、六十四小庄客家聚落，為了保護家園與莊民生命安全，決定團結起來。
+                    </p>
+
+                    <button onclick="toggleStoryDetail('story-1')" class="text-xs font-bold text-brickRed hover:underline flex items-center">
+                        <span class="btn-text">查看延伸故事與史料</span> <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                    <div id="story-1" class="hidden mt-3 p-3 bg-paperDark/40 rounded text-xs text-stone-700 space-y-2 border border-vintageBorder/30">
+                        <p><strong>進階史料：</strong>《重修鳳山縣志》記載，當時客家庄民「集眾籌議，結營自保」，展現高度的組織效率。</p>
+                    </div>
+                </div>
+
+                <!-- Story Card 2 -->
+                <div class="story-card bg-paper border-2 border-vintageBorder rounded-2xl p-6 shadow-md relative hover:shadow-xl transition reveal-on-scroll delay-200">
+                    <div class="photo-tape"></div>
+                    <span class="absolute top-4 right-4 text-3xl font-heading font-black text-vintageBorder/30">02</span>
+                    <span class="inline-block bg-hakkaBlue text-paper text-xs font-bold px-2.5 py-1 rounded mb-3">七營組成</span>
+                    <h4 class="font-heading text-2xl font-bold text-inkBlack mb-3">七營誕生：組織民兵</h4>
+                    
+                    <div class="photo-frame mb-4">
+                        <img src="https://images.unsplash.com/photo-1590076175571-4b5459efb08c?auto=format&fit=crop&w=800&q=80" alt="客家夥房與防衛建築" class="w-full h-48 object-cover filter sepia-[0.3]" onerror="this.src='https://placehold.co/800x400/E8DCB8/1C1917?text=客家夥房與防防衛隘口'">
+                        <p class="text-xs text-stone-600 mt-2 font-serif">圖：客家庄內具備防禦功能的夥房與圍牆構造</p>
+                    </div>
+
+                    <blockquote class="border-l-4 border-hakkaBlue pl-3 italic text-stone-700 text-sm mb-3">
+                        「按地理位置劃分區域，各庄出丁組成義民軍，保衛鄉里！」
+                    </blockquote>
+
+                    <p class="story-text text-stone-800 text-sm leading-relaxed mb-4">
+                        莊民在西勢（今竹田鄉）集會，依據地理方位將各庄編組成「前、後、中、左、右、先鋒」以及「督率營」，共有七營。這是六堆軍事自衛組織的雛形。
+                    </p>
+
+                    <button onclick="toggleStoryDetail('story-2')" class="text-xs font-bold text-hakkaBlue hover:underline flex items-center">
+                        <span class="btn-text">查看延伸故事與史料</span> <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                    <div id="story-2" class="hidden mt-3 p-3 bg-paperDark/40 rounded text-xs text-stone-700 space-y-2 border border-vintageBorder/30">
+                        <p><strong>問與答：</strong>「為什麼不依姓氏分，而要依地理區域分？」答：按區域防守能最快速動員鄰近村莊互相支援！</p>
+                    </div>
+                </div>
+
+                <!-- Story Card 3 -->
+                <div class="story-card bg-paper border-2 border-vintageBorder rounded-2xl p-6 shadow-md relative hover:shadow-xl transition reveal-on-scroll delay-100">
+                    <div class="photo-tape"></div>
+                    <span class="absolute top-4 right-4 text-3xl font-heading font-black text-vintageBorder/30">03</span>
+                    <span class="inline-block bg-riceYellow text-paper text-xs font-bold px-2.5 py-1 rounded mb-3">屏東平原保衛戰</span>
+                    <h4 class="font-heading text-2xl font-bold text-inkBlack mb-3">大敗叛軍：平定戰亂</h4>
+                    
+                    <div class="photo-frame mb-4">
+                        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80" alt="古戰場遺跡" class="w-full h-48 object-cover filter sepia-[0.3]" onerror="this.src='https://placehold.co/800x400/E8DCB8/1C1917?text=戰役歷史遺跡地點'">
+                        <p class="text-xs text-stone-600 mt-2 font-serif">圖：昔日義民部隊渡河防守之隘口遺址現況</p>
+                    </div>
+
+                    <blockquote class="border-l-4 border-riceYellow pl-3 italic text-stone-700 text-sm mb-3">
+                        「紀律嚴明，保家衛民，成功阻擋動亂蔓延至屏東平原。」
+                    </blockquote>
+
+                    <p class="story-text text-stone-800 text-sm leading-relaxed mb-4">
+                        義民軍配合清朝官軍擊退叛軍，成功守護了高屏庄頭的安寧。戰事平定後，清朝朝廷賜頒匾額褒揚義民的忠義精神。
+                    </p>
+
+                    <button onclick="toggleStoryDetail('story-3')" class="text-xs font-bold text-amber-800 hover:underline flex items-center">
+                        <span class="btn-text">查看延伸故事與史料</span> <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                    <div id="story-3" class="hidden mt-3 p-3 bg-paperDark/40 rounded text-xs text-stone-700 space-y-2 border border-vintageBorder/30">
+                        <p><strong>教學引導：</strong>此事件奠定了客家義民在臺灣歷史上的特殊地位，也深化了各庄之間的命運共同體意識。</p>
+                    </div>
+                </div>
+
+                <!-- Story Card 4 -->
+                <div class="story-card bg-paper border-2 border-vintageBorder rounded-2xl p-6 shadow-md relative hover:shadow-xl transition reveal-on-scroll delay-200">
+                    <div class="photo-tape"></div>
+                    <span class="absolute top-4 right-4 text-3xl font-heading font-black text-vintageBorder/30">04</span>
+                    <span class="inline-block bg-emerald-700 text-paper text-xs font-bold px-2.5 py-1 rounded mb-3">忠義亭建立</span>
+                    <h4 class="font-heading text-2xl font-bold text-inkBlack mb-3">營變成堆：忠義祠誕生</h4>
+                    
+                    <div class="photo-frame mb-4">
+                        <img src="https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80" alt="忠義祠傳統建築" class="w-full h-48 object-cover filter sepia-[0.3]" onerror="this.src='https://placehold.co/800x400/E8DCB8/1C1917?text=西勢忠義祠總壇舊照'">
+                        <p class="text-xs text-stone-600 mt-2 font-serif">圖：位於竹田西勢的六堆忠義祠（昔稱忠義亭）</p>
+                    </div>
+
+                    <blockquote class="border-l-4 border-emerald-700 pl-3 italic text-stone-700 text-sm mb-3">
+                        「和平時期稱為『堆』，有戰事時則為『營』。忠義亭成為最高精神中心。」
+                    </blockquote>
+
+                    <p class="story-text text-stone-800 text-sm leading-relaxed mb-4">
+                        戰後，原本的自衛營組織轉化為常態性的區域聯防機構，並將「營」改稱為「堆」。清康熙六十一年（1722）興建「忠義亭」，作為祭祀陣亡義民與聚會議事的總總樞紐。
+                    </p>
+
+                    <button onclick="toggleStoryDetail('story-4')" class="text-xs font-bold text-emerald-800 hover:underline flex items-center">
+                        <span class="btn-text">查看延伸故事與史料</span> <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                    <div id="story-4" class="hidden mt-3 p-3 bg-paperDark/40 rounded text-xs text-stone-700 space-y-2 border border-vintageBorder/30">
+                        <p><strong>總理制度：</strong>六堆設有「總理」與「副總理」，由各堆推舉德高望重人士擔任，處理跨庄事務。</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Life & Culture Column -->
+            <div class="mt-16 bg-paperDark/50 border-2 border-vintageBorder rounded-2xl p-6 shadow-md reveal-on-scroll delay-300">
+                <h4 class="font-heading text-xl font-bold text-stone-900 mb-4 flex items-center">
+                    <i class="fa-solid fa-house-chimney-window text-brickRed mr-2"></i> 六堆客家生活小專欄
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-paper p-4 rounded-lg border border-vintageBorder/40 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-2">
+                                <i class="fa-solid fa-shirt text-2xl text-hakkaBlue"></i>
+                                <h5 class="font-bold text-base text-inkBlack">客家藍衫 (大襟衫)</h5>
+                            </div>
+                            <p class="text-xs text-stone-700 leading-relaxed font-serif">
+                                藍衫以植物「大青」（藍草）染製的大藍布縫製，具備耐磨、耐臟與防蚊蟲特性。衣服多為「右衽大襟」設計，開襟處配有精美的手工布扣（紐鋏）。藍衫不僅是早期六堆婦女日常勞動與祭典的服飾，也深刻反映了客家先民勤儉持家、硬頸耐勞的精神象徵。
+                            </p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-stone-200 text-[11px] text-brickRed font-medium">
+                            <i class="fa-solid fa-circle-info mr-1"></i> 文化亮點：右衽大襟、小絲帶（小盤扣）象徵吉祥與婦德傳承。
+                        </div>
+                    </div>
+
+                    <div class="bg-paper p-4 rounded-lg border border-vintageBorder/40 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-2">
+                                <i class="fa-solid fa-kaaba text-2xl text-brickRed"></i>
+                                <h5 class="font-bold text-base text-inkBlack">客家夥房 (三合院與堂號)</h5>
+                            </div>
+                            <p class="text-xs text-stone-700 leading-relaxed font-serif">
+                                夥房是六堆以宗族血緣為核心的傳統圍籠屋與正身橫屋建築。正廳供奉歷代祖先牌位與天地神明，正門上方高懸宗族「堂號」（如潁川堂、弘農堂）。六堆夥房多具備「化胎」（象徵靠山與後代繁衍）與「半月池」（防災、調節氣溫與風水），展現重視敬祖尊宗與家族凝聚力。
+                            </p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-stone-200 text-[11px] text-brickRed font-medium">
+                            <i class="fa-solid fa-circle-info mr-1"></i> 建築特色：堂實屋虛、化胎半月池、屋脊燕尾與馬背。
+                        </div>
+                    </div>
+
+                    <div class="bg-paper p-4 rounded-lg border border-vintageBorder/40 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-2">
+                                <i class="fa-solid fa-place-of-worship text-2xl text-riceYellow"></i>
+                                <h5 class="font-bold text-base text-inkBlack">土地伯公 (開基與庄頭伯公)</h5>
+                            </div>
+                            <p class="text-xs text-stone-700 leading-relaxed font-serif">
+                                客家人稱土地公為「伯公」，視為如家族長輩般親切的守護神。六堆地區常見「墓塚式伯公」（保留開墾初期石板或石堆型態，後方有弧形石壘）與「開基伯公」。水圳頭設有「水口伯公」、庄頭庄尾設「柵門伯公」，構成完整保佑水利作物與庄頭安寧的神聖防線。
+                            </p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-stone-200 text-[11px] text-brickRed font-medium">
+                            <i class="fa-solid fa-circle-info mr-1"></i> 信仰特色：祭拜常備盤花與新丁粄，祈求平安與人丁興旺。
+                        </div>
+                    </div>
+
+                    <div class="bg-paper p-4 rounded-lg border border-vintageBorder/40 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center space-x-3 mb-2">
+                                <i class="fa-solid fa-comments text-2xl text-emerald-700"></i>
+                                <h5 class="font-bold text-base text-inkBlack">南四縣腔 (語言與常民口傳)</h5>
+                            </div>
+                            <p class="text-xs text-stone-700 leading-relaxed font-serif">
+                                六堆主要通行的客家話方言為「南四縣腔」（源自原鄉嘉應州梅縣、蕉嶺、平遠等地）。與北部四縣腔相比，南四縣腔在聲調（如陰平調值）與部分詞彙習慣上具有獨特的南部在地韻味。透過客家山歌、諺語、童謠與八音吹打樂，將拓墾記憶與生活智慧代代口傳。
+                            </p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-stone-200 text-[11px] text-brickRed font-medium">
+                            <i class="fa-solid fa-circle-info mr-1"></i> 地方聲調：高屏客庄獨特的音調韻味與客家八音音樂藝術。
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 04 INTERACTIVE TIMELINE & MAP SECTION -->
+    <section id="interactive-map" class="py-20 border-b-4 border-vintageBorder/20 bg-paperDark/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-10 reveal-on-scroll">
+                <h2 class="text-xs font-bold text-brickRed tracking-widest uppercase">SECTION 04</h2>
+                <h3 class="font-heading text-3xl sm:text-4xl font-black text-inkBlack mt-1">核心互動：時間軸與六堆地圖</h3>
+                <div class="w-16 h-1 bg-brickRed mx-auto my-3 rounded"></div>
+                <p class="text-stone-700 font-serif">點擊時間節點或地圖區域，探索重大歷史事件與對應地理位置！</p>
+            </div>
+
+            <!-- Horizontal Timeline Controls (Enlarged) -->
+            <div class="mb-12 overflow-x-auto py-6 px-2 reveal-on-scroll delay-100 scrollbar-none">
+                <div class="flex space-x-4 min-w-[900px] justify-between px-6 relative py-4 bg-paper/60 border-2 border-vintageBorder/30 rounded-2xl shadow-inner" id="timeline-nodes-container">
+                    <!-- Line connector -->
+                    <div class="absolute top-1/2 left-8 right-8 h-2 bg-gradient-to-r from-vintageBorder/20 via-brickRed/40 to-vintageBorder/20 -translate-y-1/2 rounded-full z-0"></div>
+
+                    <!-- Nodes (Slightly larger with prominent hover state) -->
+                    <button onclick="selectTimeline(0)" class="timeline-node relative z-10 flex flex-col items-center group focus:outline-none py-1 px-2" data-index="0">
+                        <span class="timeline-node-circle w-12 h-12 rounded-full bg-brickRed text-white text-base font-bold flex items-center justify-center border-4 border-paper shadow-lg ring-2 ring-brickRed">1</span>
+                        <span class="text-sm font-bold mt-3 text-stone-900 tracking-wide group-hover:text-brickRed transition-colors">1686年起</span>
+                        <span class="text-xs font-medium text-stone-600">渡臺拓墾</span>
+                    </button>
+
+                    <button onclick="selectTimeline(1)" class="timeline-node relative z-10 flex flex-col items-center group focus:outline-none py-1 px-2" data-index="1">
+                        <span class="timeline-node-circle w-12 h-12 rounded-full bg-paper border-4 border-vintageBorder text-stone-700 text-base font-bold flex items-center justify-center shadow-md">2</span>
+                        <span class="text-sm font-bold mt-3 text-stone-900 tracking-wide group-hover:text-brickRed transition-colors">1721年</span>
+                        <span class="text-xs font-medium text-stone-600">朱一貴事件</span>
+                    </button>
+
+                    <button onclick="selectTimeline(2)" class="timeline-node relative z-10 flex flex-col items-center group focus:outline-none py-1 px-2" data-index="2">
+                        <span class="timeline-node-circle w-12 h-12 rounded-full bg-paper border-4 border-vintageBorder text-stone-700 text-base font-bold flex items-center justify-center shadow-md">3</span>
+                        <span class="text-sm font-bold mt-3 text-stone-900 tracking-wide group-hover:text-brickRed transition-colors">1722年</span>
+                        <span class="text-xs font-medium text-stone-600">忠義亭建立</span>
+                    </button>
+
+                    <button onclick="selectTimeline(3)" class="timeline-node relative z-10 flex flex-col items-center group focus:outline-none py-1 px-2" data-index="3">
+                        <span class="timeline-node-circle w-12 h-12 rounded-full bg-paper border-4 border-vintageBorder text-stone-700 text-base font-bold flex items-center justify-center shadow-md">4</span>
+                        <span class="text-sm font-bold mt-3 text-stone-900 tracking-wide group-hover:text-brickRed transition-colors">1786年</span>
+                        <span class="text-xs font-medium text-stone-600">林爽文事件</span>
+                    </button>
+
+                    <button onclick="selectTimeline(4)" class="timeline-node relative z-10 flex flex-col items-center group focus:outline-none py-1 px-2" data-index="4">
+                        <span class="timeline-node-circle w-12 h-12 rounded-full bg-paper border-4 border-vintageBorder text-stone-700 text-base font-bold flex items-center justify-center shadow-md">5</span>
+                        <span class="text-sm font-bold mt-3 text-stone-900 tracking-wide group-hover:text-brickRed transition-colors">1895年</span>
+                        <span class="text-xs font-medium text-stone-600">乙未戰爭</span>
+                    </button>
+
+                    <button onclick="selectTimeline(5)" class="timeline-node relative z-10 flex flex-col items-center group focus:outline-none py-1 px-2" data-index="5">
+                        <span class="timeline-node-circle w-12 h-12 rounded-full bg-paper border-4 border-vintageBorder text-stone-700 text-base font-bold flex items-center justify-center shadow-md">6</span>
+                        <span class="text-sm font-bold mt-3 text-stone-900 tracking-wide group-hover:text-brickRed transition-colors">現代</span>
+                        <span class="text-xs font-medium text-stone-600">六堆運動會</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Layout: Map (Left) & Event Details (Right) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Map Graphic (5 Cols) -->
+                <div class="lg:col-span-5 bg-paper border-2 border-vintageBorder rounded-2xl p-5 shadow-lg reveal-on-scroll delay-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-heading font-bold text-stone-900 text-base">
+                            <i class="fa-solid fa-map-location-dot text-brickRed mr-1"></i> 高屏地區六堆分布圖
+                        </h4>
+                        <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded border border-amber-300">點選各堆高亮</span>
+                    </div>
+
+                    <!-- SVG Map of Liugdui (6 Regions) -->
+                    <svg viewBox="0 0 400 480" class="w-full h-auto rounded bg-[#FAF5E8] border border-vintageBorder/30">
+                        <!-- Background Pingtung Outline representation -->
+                        <!-- Right Heap (美濃/杉林) -->
+                        <path id="heap-right" class="map-region" onclick="selectHeap('right')" d="M 210,40 L 320,30 L 350,110 L 260,130 Z" fill="#818CF8" fill-opacity="0.5" stroke="#3730A3" stroke-width="2"/>
+                        <text x="270" y="80" fill="#1E1B4B" font-size="12" font-weight="bold" pointer-events="none">右堆 (美濃/高樹)</text>
+
+                        <!-- Vanguard Heap (萬巒) -->
+                        <path id="heap-vanguard" class="map-region" onclick="selectHeap('vanguard')" d="M 200,220 L 300,210 L 320,290 L 220,280 Z" fill="#F43F5E" fill-opacity="0.5" stroke="#9F1239" stroke-width="2"/>
+                        <text x="235" y="250" fill="#881337" font-size="12" font-weight="bold" pointer-events="none">先鋒堆 (萬巒)</text>
+
+                        <!-- Front Heap (長治/麟洛) -->
+                        <path id="heap-front" class="map-region" onclick="selectHeap('front')" d="M 130,140 L 230,130 L 210,190 L 120,180 Z" fill="#34D399" fill-opacity="0.5" stroke="#065F46" stroke-width="2"/>
+                        <text x="145" y="165" fill="#064E3B" font-size="12" font-weight="bold" pointer-events="none">前堆 (長治/麟洛)</text>
+
+                        <!-- Middle Heap (竹田) -->
+                        <path id="heap-middle" class="map-region" onclick="selectHeap('middle')" d="M 130,195 L 200,195 L 190,260 L 120,250 Z" fill="#FBBF24" fill-opacity="0.5" stroke="#92400E" stroke-width="2"/>
+                        <text x="135" y="230" fill="#78350F" font-size="11" font-weight="bold" pointer-events="none">中堆 (竹田)</text>
+
+                        <!-- Rear Heap (內埔) -->
+                        <path id="heap-rear" class="map-region" onclick="selectHeap('rear')" d="M 210,140 L 280,130 L 290,200 L 205,195 Z" fill="#60A5FA" fill-opacity="0.5" stroke="#1E40AF" stroke-width="2"/>
+                        <text x="225" y="170" fill="#1E3A8A" font-size="12" font-weight="bold" pointer-events="none">後堆 (內埔)</text>
+
+                        <!-- Left Heap (佳冬/新埤) -->
+                        <path id="heap-left" class="map-region" onclick="selectHeap('left')" d="M 150,280 L 240,290 L 220,390 L 130,370 Z" fill="#A78BFA" fill-opacity="0.5" stroke="#5B21B6" stroke-width="2"/>
+                        <text x="160" y="340" fill="#4C1D95" font-size="12" font-weight="bold" pointer-events="none">左堆 (佳冬/新埤)</text>
+
+                        <!-- River markings -->
+                        <path d="M 80,50 Q 120,200 90,420" fill="none" stroke="#60A5FA" stroke-width="3" stroke-dasharray="4,2"/>
+                        <text x="20" y="250" fill="#2563EB" font-size="10">高屏溪 (下淡水溪)</text>
+                    </svg>
+
+                    <div class="mt-3 text-xs text-stone-600 space-y-1 font-serif">
+                        <p><strong>高屏六堆範圍說明：</strong></p>
+                        <p>• <strong>前堆：</strong>長治、麟洛、屏東市部分</p>
+                        <p>• <strong>後堆：</strong>內埔 | <strong>中堆：</strong>竹田</p>
+                        <p>• <strong>先鋒堆：</strong>萬巒 | <strong>左堆：</strong>佳冬、新埤</p>
+                        <p>• <strong>右堆：</strong>美濃、高樹、六龜、杉林</p>
+                    </div>
+                </div>
+
+                <!-- Detailed Event Panel (7 Cols) -->
+                <div class="lg:col-span-7 bg-paper border-2 border-vintageBorder rounded-2xl p-6 shadow-lg reveal-on-scroll delay-300">
+                    <div class="flex items-center justify-between border-b border-vintageBorder/40 pb-3 mb-4">
+                        <span id="event-year" class="bg-brickRed text-paper font-bold text-sm px-3 py-1 rounded-full">1686年起</span>
+                        <span id="event-heap-tag" class="text-xs font-semibold text-stone-600 bg-paperDark px-2.5 py-1 rounded border">涵蓋範圍：全六堆地區</span>
+                    </div>
+
+                    <h3 id="event-title" class="font-heading text-2xl font-bold text-inkBlack mb-3">客家先民渡臺與下淡水溪拓墾</h3>
+
+                    <!-- Image Frame -->
+                    <div class="photo-frame mb-4">
+                        <img id="event-img" src="https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80" alt="事件歷史照" class="w-full h-52 object-cover" onerror="this.src='https://placehold.co/800x400/E8DCB8/1C1917?text=歷史事件相關圖檔'">
+                        <p id="event-caption" class="text-xs text-stone-600 mt-2 font-serif">清代屏東平原古圖與下淡水溪地理環境</p>
+                    </div>
+
+                    <!-- 3-Tier Explanations -->
+                    <div class="space-y-4">
+                        <!-- Level 1: One Sentence Summary for Students -->
+                        <div class="bg-amber-50 p-3.5 rounded-xl border border-amber-200">
+                            <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block mb-1">
+                                <i class="fa-solid fa-star text-riceYellow mr-1"></i> 一句話重點 (小學生版)
+                            </span>
+                            <p id="event-level-1" class="text-sm font-medium text-stone-800">
+                                先民渡過大海來到臺灣，沿著屏東的河流建立了一個個安居樂業的村莊。
+                            </p>
+                        </div>
+
+                        <!-- Level 2: Detailed Story -->
+                        <div>
+                            <h5 class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">故事背景說明</h5>
+                            <p id="event-level-2" class="text-sm text-stone-700 leading-relaxed font-serif">
+                                清康熙中期開始，客家移民大規模進入下淡水溪（今高屏溪）東岸的屏東平原。由於沿海較好的土地已被早到的移民開墾，先民選擇在靠近山腳與河川的中游地帶圍墾，建立十三大庄與六十四小庄。
+                            </p>
+                        </div>
+
+                        <!-- Level 3: Historical Records & References -->
+                        <div class="border-t border-vintageBorder/30 pt-3">
+                            <button onclick="toggleElement('historical-doc-box')" class="text-xs font-bold text-brickRed hover:underline flex items-center">
+                                <i class="fa-solid fa-scroll mr-1"></i> 展開史料原文與研究文獻 (文化工作者)
+                            </button>
+                            <div id="historical-doc-box" class="hidden mt-2 p-3 bg-stone-100 rounded text-xs text-stone-700 space-y-1 font-mono border border-stone-300">
+                                <p id="event-level-3">《臺灣府志》記載：「鳳山縣下淡水溪東，客莊土地肥饒，莊民勤於耕作，結庄自保...」</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 05 CONCLUSION & QUIZ SECTION -->
+    <section id="conclusion" class="py-20 border-b-4 border-vintageBorder/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12 reveal-on-scroll">
+                <h2 class="text-xs font-bold text-brickRed tracking-widest uppercase">SECTION 05</h2>
+                <h3 class="font-heading text-3xl sm:text-4xl font-black text-inkBlack mt-1">從守護家園到守護文化</h3>
+                <div class="w-16 h-1 bg-brickRed mx-auto my-3 rounded"></div>
+                <p class="text-stone-700 font-serif">走過三百年的歲月，昔日的防衛組織「六堆」，如今已轉化為高屏地區客家精神與文化認同的代名詞。</p>
+            </div>
+
+            <!-- Modern Modern Transformation Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                <div class="bg-paper border-2 border-vintageBorder rounded-xl p-5 shadow reveal-on-scroll delay-100">
+                    <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=500&q=80" alt="六堆運動會" class="w-full h-36 object-cover rounded mb-3" onerror="this.src='https://placehold.co/500x300/E8DCB8/1C1917?text=六堆運動會實況'">
+                    <h4 class="font-heading font-bold text-lg text-inkBlack">六堆運動會 (大堆頭體育盛事)</h4>
+                    <p class="text-xs text-stone-600 mt-2">自1948年起舉辦，由六堆各鄉鎮輪流主辦，被譽為「南部客家奧林匹克」。</p>
+                </div>
+
+                <div class="bg-paper border-2 border-vintageBorder rounded-xl p-5 shadow reveal-on-scroll delay-200">
+                    <img src="https://images.unsplash.com/photo-1561489413-985b06da5bee?auto=format&fit=crop&w=500&q=80" alt="忠義祠祭典" class="w-full h-36 object-cover rounded mb-3" onerror="this.src='https://placehold.co/500x300/E8DCB8/1C1917?text=忠義祠秋祭儀式'">
+                    <h4 class="font-heading font-bold text-lg text-inkBlack">忠義祠祭典與義民文化節</h4>
+                    <p class="text-xs text-stone-600 mt-2">每年春秋二祭傳承忠義精神，展現六堆庄民對先祖與這片土地的追思。</p>
+                </div>
+
+                <div class="bg-paper border-2 border-vintageBorder rounded-xl p-5 shadow reveal-on-scroll delay-300">
+                    <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=500&q=80" alt="六堆園區與今日客庄" class="w-full h-36 object-cover rounded mb-3" onerror="this.src='https://placehold.co/500x300/E8DCB8/1C1917?text=六堆客家文化園區'">
+                    <h4 class="font-heading font-bold text-lg text-inkBlack">六堆客家文化園區與當代體驗</h4>
+                    <p class="text-xs text-stone-600 mt-2">保存水圳、夥房與傳統產業，讓新一代學子隨時能走進客家文化現場。</p>
+                </div>
+            </div>
+
+            <!-- Quiz & Badge Challenge -->
+            <div class="bg-paper border-2 border-vintageBorder rounded-2xl p-6 sm:p-8 shadow-xl max-w-3xl mx-auto relative overflow-hidden reveal-on-scroll delay-200">
+                <div class="photo-tape"></div>
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 rounded-full bg-brickRed text-white flex items-center justify-center font-bold text-xl">
+                        <i class="fa-solid fa-medal"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-bold text-2xl text-inkBlack">我的六堆探險：大闖關</h4>
+                        <p class="text-xs text-stone-600">完成5題小測驗，即可獲得「六堆文化小達人」勳章！</p>
+                    </div>
+                </div>
+
+                <!-- Quiz Box Container -->
+                <div id="quiz-container" class="space-y-6">
+                    <!-- Dynamic Question Area -->
+                    <div id="question-box">
+                        <!-- Questions will be rendered via JS -->
+                    </div>
+
+                    <!-- Progress Indicator -->
+                    <div class="flex justify-between items-center text-xs font-bold text-stone-500 pt-4 border-t border-vintageBorder/30">
+                        <span id="quiz-progress-text">問題 1 / 5</span>
+                        <span id="quiz-score-text">目前得分：0 分</span>
+                    </div>
+                </div>
+
+                <!-- Badge Award Modal / Box (Hidden initially) -->
+                <div id="badge-award-box" class="hidden text-center py-8 space-y-4">
+                    <div class="w-24 h-24 mx-auto bg-amber-400 rounded-full flex items-center justify-center shadow-lg ring-4 ring-brickRed animate-bounce">
+                        <i class="fa-solid fa-award text-5xl text-brickRed"></i>
+                    </div>
+                    <h4 class="font-heading font-bold text-2xl text-brickRed">恭喜獲得【六堆文化探險家】榮譽徽章！</h4>
+                    <p class="text-stone-700 text-sm max-w-md mx-auto">
+                        你已經順利完成了六堆聚落形成史的旅程，對這片土地的故事有了深刻的了解！
+                    </p>
+                    <button onclick="resetQuiz()" class="bg-brickRed text-paper font-bold px-6 py-2 rounded-lg hover:bg-red-800 transition shadow">
+                        重新挑戰
+                    </button>
+                </div>
+            </div>
+
+            <!-- References & Sources Section -->
+            <div class="mt-16 border-t-2 border-vintageBorder/30 pt-10 grid grid-cols-1 md:grid-cols-2 gap-8 text-xs text-stone-600 font-serif">
+                <div>
+                    <h5 class="font-bold text-stone-800 text-sm mb-2 flex items-center">
+                        <i class="fa-solid fa-book mr-1 text-brickRed"></i> 延伸閱讀與推薦學習單
+                    </h5>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>《六堆客家社會與文化》- 客家委員會出版</li>
+                        <li>《屏東縣志：客家篇》- 屏東縣政府</li>
+                        <li>國小社會科五上：臺灣的開發與族群聚落</li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold text-stone-800 text-sm mb-2 flex items-center">
+                        <i class="fa-solid fa-building-columns mr-1 text-hakkaBlue"></i> 史料典藏與授權說明
+                    </h5>
+                    <p class="leading-relaxed">
+                        本網站古圖、史料與遺跡照片主要引用自國家文化記憶庫、故宮Open Data、六堆客家文化園區及Wikimedia Commons公有領域授權圖像。僅供教育與文化推廣用途。
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-8 border-t border-stone-800 text-center text-xs font-serif">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p>六堆客家聚落形成史 | 數位教學與文史導覽平臺</p>
+            <p class="text-stone-500">建議使用 Chrome, Firefox, Safari 最新版本瀏覽</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Global State & Role Data
+        let currentRole = localStorage.getItem('liugdui_role') || 'student';
+        let currentTimelineIndex = 0;
+        let quizScore = 0;
+        let currentQuestionIndex = 0;
+
+        // Timeline Data Model
+        const timelineData = [
+            {
+                year: "1686年起",
+                title: "客家先民渡臺與下淡水溪拓墾",
+                heapTag: "涵蓋範圍：全六堆地區",
+                heapId: "front",
+                image: "https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=800&q=80",
+                caption: "清代屏東平原古圖與下淡水溪地理環境",
+                level1: "先民渡過大海來到臺灣，沿著屏東的河流建立了一個個安居樂業的村莊。",
+                level2: "清康熙中期開始，客家移民大規模進入下淡水溪（今高屏溪）東岸的屏東平原。由於沿海較好的土地已被早到的移民開墾，先民選擇在靠近山腳與河川的中游地帶圍墾，建立十三大庄與六十四小庄。",
+                level3: "《臺灣府志》記載：「鳳山縣下淡水溪東，客莊土地肥饒，莊民勤於耕作，結庄自保...」"
+            },
+            {
+                year: "1721年",
+                title: "朱一貴事件發端與十三大庄結盟",
+                heapTag: "高亮：中堆 (竹田西勢)",
+                heapId: "middle",
+                image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80",
+                caption: "朱一貴事件期間，各庄領袖集會討論防衛計畫",
+                level1: "社會發生混亂時，莊民們決定團結起來，排解糾紛、守護家園！",
+                level2: "朱一貴起事引發全臺動盪，為防範戰禍波及平原上的客家庄頭，十三大庄與六十四小庄代表聚集於西勢（今竹田），決定組編成民兵組織。",
+                level3: "《重修鳳山縣志》：「朱一貴之亂，下淡水客莊居民集眾籌議，結營自保，劃地防守。」"
+            },
+            {
+                year: "1722年",
+                title: "建立忠義亭與「營」改稱為「堆」",
+                heapTag: "高亮：中堆 (西勢忠義祠)",
+                heapId: "middle",
+                image: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80",
+                caption: "西勢忠義祠（昔稱忠義亭）全景與匾額",
+                level1: "戰事結束後，七個防禦營區改名為『堆』，忠義亭成為大家的精神中心！",
+                level2: "事件平定後，清廷賜匾褒揚。莊民興建忠義亭祭祀陣亡義民，並將平日的聯防分區稱為「堆」，形成了先鋒堆、前堆、後堆、中堆、左堆、右堆的架構。",
+                level3: "清代《六堆忠義亭記》：「忠義亭者，六堆義民祭祀議事之所也。」"
+            },
+            {
+                year: "1786年",
+                title: "林爽文事件與多次區域防衛",
+                heapTag: "高亮：後堆 (內埔) 與 先鋒堆 (萬巒)",
+                heapId: "rear",
+                image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80",
+                caption: "六堆義民再次動員防守屏東平原關隘",
+                level1: "動亂再度發生時，六堆制度發揮了強大的團結力量，再次保護了村莊。",
+                level2: "林爽文事件爆發，六堆再次啟動動員機制，由大總理率領六堆義民軍維持高屏地區秩序，展現出高度成熟的自治防衛能力。",
+                level3: "《臺灣采訪冊》記載六堆於林爽文事件中之出征路線與守禦要塞細節。"
+            },
+            {
+                year: "1895年",
+                title: "乙未戰爭：步月樓與火燒莊之役",
+                heapTag: "高亮：左堆 (佳冬) 與 前堆 (長治)",
+                heapId: "left",
+                image: "https://images.unsplash.com/photo-1590076175571-4b5459efb08c?auto=format&fit=crop&w=800&q=80",
+                caption: "佳冬步月樓遺址現況與防範槍眼",
+                level1: "面對外來軍隊，六堆鄉親並肩作戰，寫下了英勇保鄉衛土的一頁。",
+                level2: "1895年乙未戰爭爆發，日軍登陸南部。六堆義民在大總理邱鳳揚等人帶領下，於佳冬步月樓及長治火燒莊展開艱苦卓絕的保鄉戰役。",
+                level3: "《乙未抗日史料》：步月樓之役為乙未戰爭南部最慘烈之戰役之一。"
+            },
+            {
+                year: "現代",
+                title: "六堆運動會與文化資產永續傳承",
+                heapTag: "涵蓋範圍：全六堆地區與美濃",
+                heapId: "right",
+                image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80",
+                caption: "現代六堆運動會聖火點燃與各堆繞場實況",
+                level1: "現在的六堆不再需要打仗，而是透過體育運動會與文化節日熱鬧團聚！",
+                level2: "戰後的六堆轉化為強烈的文化認同符號。1948年創辦的「六堆運動會」延續至今，成為凝聚高屏客家族群感情最重要的年度盛事。",
+                level3: "客家委員會《六堆三百年文化資產調查報告》：六堆為全臺唯一兼具歷史脈絡與區域聯防特色之客家聚落群。"
+            }
+        ];
+
+        // Quiz Questions
+        const quizQuestions = [
+            {
+                q: "1. 先民當初渡海來到臺灣開墾時，主要來自廣東的哪些地方？",
+                options: ["上海與北京", "惠州、潮州與嘉應州", "台北與宜蘭", "香港與澳門"],
+                answer: 1
+            },
+            {
+                q: "2. 1721年朱一貴事件時，客家庄民為了自保，最早成立了幾個『營』？",
+                options: ["3個", "5個", "7個", "12個"],
+                answer: 2
+            },
+            {
+                q: "3. 西勢忠義祠（忠義亭）建立後，成為了六堆地區的什麼中心？",
+                options: ["商業買賣中心", "精神祭祀與議事中心", "外國語言學校", "官府辦公室"],
+                answer: 1
+            },
+            {
+                q: "4. 下列哪一個不是六堆的名稱之一？",
+                options: ["先鋒堆", "中堆", "大西洋堆", "左堆"],
+                answer: 2
+            },
+            {
+                q: "5. 現代的六堆鄉親，主要透過哪一項大型盛事來凝聚六個堆的感情與傳統？",
+                options: ["六堆運動會", "六堆游泳賽", "六堆賽車節", "六堆電影節"],
+                answer: 0
+            }
+        ];
+
+        // Initialize Page
+        window.onload = function() {
+            setRole(currentRole);
+            selectTimeline(0);
+            renderQuiz();
+            setupRoleSelectorDropdown();
+            initTitleAnimation();
+            initScrollObserver();
+        };
+
+        // Scroll Observer for Section Animations
+        function initScrollObserver() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -50px 0px',
+                threshold: 0.12
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, observerOptions);
+
+            const elementsToAnimate = document.querySelectorAll('.reveal-on-scroll');
+            elementsToAnimate.forEach(el => observer.observe(el));
+        }
+
+        // Heading Stroke Animation
+        function initTitleAnimation() {
+            if (typeof anime === 'undefined') return;
+
+            const path = document.querySelector('.title-svg path.line');
+            if (path) {
+                const length = path.getTotalLength();
+                path.style.strokeDasharray = length;
+                path.style.strokeDashoffset = length;
+
+                anime({
+                    targets: path,
+                    strokeDashoffset: [length, 0],
+                    easing: 'easeInOutCubic',
+                    duration: 1500,
+                    delay: 300
+                });
+            }
+
+            // Text entrance animation
+            anime({
+                targets: '.title-svg text',
+                opacity: [0, 1],
+                translateY: [10, 0],
+                delay: anime.stagger(200),
+                easing: 'easeOutQuad',
+                duration: 1000
+            });
+        }
+
+        // Role Management Logic
+        function setRole(role) {
+            currentRole = role;
+            localStorage.setItem('liugdui_role', role);
+
+            const roleTexts = {
+                student: '學生視角 (探險家)',
+                teacher: '老師/家長視角',
+                researcher: '文化工作者視角'
+            };
+            document.getElementById('current-role-text').innerText = roleTexts[role] || '學生視角';
+
+            // Update Hero Guide Banner Text
+            const heroGuide = document.getElementById('hero-guide-text');
+            const bgSub = document.getElementById('bg-section-subtitle');
+            const bgText = document.getElementById('bg-section-text');
+
+            if (role === 'student') {
+                heroGuide.innerText = "「嗨！歡迎進入探險家模式！跟著我觀察圖片、回答問題，完成最後的小測驗來收集勳章吧！」";
+                bgSub.innerText = "小學生探險筆記：渡海三不准與開墾艱辛";
+                bgText.innerText = "清朝當時有『渡臺禁令』，最早來臺灣開墾的客家先民非常辛苦。他們合力挖水圳灌溉農田，建立了團結合作的村莊生活。";
+            } else if (role === 'teacher') {
+                heroGuide.innerText = "「歡迎老師與家長！本版本提供了教學提問重點、核心素養概念與延伸學習單參考。」";
+                bgSub.innerText = "教學導引：高屏客家拓墾的地理與社會脈絡";
+                bgText.innerText = "建議教學重點：引導學生思考『環境適應與聚落形成』之關係。客家先民選擇屏東平原近山地帶，反映了當時族群分布與水源利用的現實考量。";
+            } else {
+                heroGuide.innerText = "「歡迎文史學者與工作者！本版本提供清代檔案文獻摘要、地圖史料與考據出處。」";
+                bgSub.innerText = "文史脈絡：清初鳳山縣下淡水溪東岸客家聚落分布考";
+                bgText.innerText = "史料顯示，康熙中葉後客籍移民多經府城或鹿耳門轉赴下淡水溪東岸墾殖。十三大庄與六十四小庄之空間架構，奠定了後續六堆聯防的地理基礎。";
+            }
+
+            // Close dropdown
+            document.getElementById('role-dropdown').classList.add('hidden');
+        }
+
+        function setupRoleSelectorDropdown() {
+            const btn = document.getElementById('role-selector-btn');
+            const dropdown = document.getElementById('role-dropdown');
+
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', () => {
+                dropdown.classList.add('hidden');
+            });
+        }
+
+        // Migration Step Info Changer
+        function showMigrationInfo(step) {
+            const title = document.getElementById('mig-title');
+            const desc = document.getElementById('mig-desc');
+            const roleBox = document.getElementById('mig-role-box');
+
+            if (step === 'guangdong') {
+                title.innerText = "1. 廣東原鄉：出發的原因";
+                desc.innerText = "清朝初期，廣東東部山區人多地少。為了尋求更好的耕地與生路，先民選擇『唐山過臺灣』。";
+                roleBox.innerHTML = "<strong><i class='fa-solid fa-lightbulb text-riceYellow mr-1'></i> 學生思維提問：</strong> 為什麼當時離鄉背井渡過危險的黑水溝需要無比的勇氣？";
+            } else if (step === 'tainan') {
+                title.innerText = "2. 臺南安平：登陸臺灣府城";
+                desc.innerText = "先民搭船渡過臺灣海峽後，多在臺南鹿耳門或安平登陸，再向南尋找合適的開墾土地。";
+                roleBox.innerHTML = "<strong><i class='fa-solid fa-chalkboard-user text-brickRed mr-1'></i> 教學重點：</strong> 引導學生認識昔日臺灣府城作為全臺門戶的歷史定位。";
+            } else if (step === 'pingtung') {
+                title.innerText = "3. 屏東平原：建立六堆聚落";
+                desc.innerText = "沿著下淡水溪與東港溪進入屏東平原，先民開墾灌溉水圳，形成今日六堆的各個庄頭。";
+                roleBox.innerHTML = "<strong><i class='fa-solid fa-book-bookmark text-riceYellow mr-1'></i> 文史延伸：</strong> 屏東平原的水利建設（如萬丹圳、曹公圳相關水系）與聚落發展緊密相連。";
+            }
+
+            // Animate detail box
+            anime({
+                targets: '#migration-detail-box',
+                opacity: [0.5, 1],
+                translateY: [10, 0],
+                duration: 400,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        // Timeline Selection Function
+        function selectTimeline(index) {
+            currentTimelineIndex = index;
+            const data = timelineData[index];
+
+            // Update UI text
+            document.getElementById('event-year').innerText = data.year;
+            document.getElementById('event-heap-tag').innerText = data.heapTag;
+            document.getElementById('event-title').innerText = data.title;
+            document.getElementById('event-img').src = data.image;
+            document.getElementById('event-caption').innerText = data.caption;
+            document.getElementById('event-level-1').innerText = data.level1;
+            document.getElementById('event-level-2').innerText = data.level2;
+            document.getElementById('event-level-3').innerText = data.level3;
+
+            // Update active node styling
+            const nodes = document.querySelectorAll('.timeline-node');
+            nodes.forEach((node, i) => {
+                const circle = node.querySelector('.timeline-node-circle');
+                if (i === index) {
+                    circle.className = "timeline-node-circle w-12 h-12 rounded-full bg-brickRed text-white text-base font-bold flex items-center justify-center border-4 border-paper shadow-lg ring-2 ring-brickRed";
+                } else {
+                    circle.className = "timeline-node-circle w-12 h-12 rounded-full bg-paper border-4 border-vintageBorder text-stone-700 text-base font-bold flex items-center justify-center shadow-md hover:border-brickRed";
+                }
+            });
+
+            // Highlight corresponding Map region
+            highlightMapRegion(data.heapId);
+
+            // Anime transition
+            anime({
+                targets: '#interactive-map .lg\\:col-span-7',
+                opacity: [0.7, 1],
+                translateX: [15, 0],
+                duration: 350,
+                easing: 'easeOutCubic'
+            });
+        }
+
+        // Highlight map region by ID
+        function highlightMapRegion(heapId) {
+            const regions = document.querySelectorAll('.map-region');
+            regions.forEach(r => r.classList.remove('active'));
+
+            if (heapId) {
+                const target = document.getElementById(`heap-${heapId}`);
+                if (target) {
+                    target.classList.add('active');
+                }
+            }
+        }
+
+        // Map Click Action
+        function selectHeap(heapId) {
+            highlightMapRegion(heapId);
+            // Find corresponding timeline item or inform user
+            const heapNames = {
+                front: "前堆 (長治/麟洛)",
+                rear: "後堆 (內埔)",
+                middle: "中堆 (竹田)",
+                vanguard: "先鋒堆 (萬巒)",
+                left: "左堆 (佳冬/新埤)",
+                right: "右堆 (美濃/高樹)"
+            };
+
+            document.getElementById('event-heap-tag').innerText = `已點選：${heapNames[heapId]}`;
+        }
+
+        // Story Cards Toggle Detail
+        function toggleStoryDetail(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        function toggleElement(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+
+        // Quiz Logic
+        function renderQuiz() {
+            const box = document.getElementById('question-box');
+            if (currentQuestionIndex >= quizQuestions.length) {
+                // Show badge award
+                document.getElementById('quiz-container').classList.add('hidden');
+                document.getElementById('badge-award-box').classList.remove('hidden');
+                return;
+            }
+
+            const qData = quizQuestions[currentQuestionIndex];
+            document.getElementById('quiz-progress-text').innerText = `問題 ${currentQuestionIndex + 1} / ${quizQuestions.length}`;
+            document.getElementById('quiz-score-text').innerText = `目前得分：${quizScore} 分`;
+
+            let optionsHTML = '';
+            qData.options.forEach((opt, idx) => {
+                optionsHTML += `
+                    <button onclick="checkAnswer(${idx})" class="w-full text-left p-3 rounded-lg border border-vintageBorder bg-paper hover:bg-paperDark transition text-stone-800 text-sm font-medium flex items-center justify-between group">
+                        <span>${opt}</span>
+                        <i class="fa-solid fa-circle-check text-stone-300 group-hover:text-brickRed"></i>
+                    </button>
+                `;
+            });
+
+            box.innerHTML = `
+                <h5 class="font-heading font-bold text-lg text-inkBlack mb-4">${qData.q}</h5>
+                <div class="space-y-2.5">${optionsHTML}</div>
+            `;
+        }
+
+        function checkAnswer(selectedIndex) {
+            const qData = quizQuestions[currentQuestionIndex];
+            if (selectedIndex === qData.answer) {
+                quizScore += 20;
+            }
+            currentQuestionIndex++;
+            renderQuiz();
+        }
+
+        function resetQuiz() {
+            quizScore = 0;
+            currentQuestionIndex = 0;
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('badge-award-box').classList.add('hidden');
+            renderQuiz();
+        }
+
+        // Mobile Nav Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
